@@ -3,7 +3,7 @@ import '../theme/App.scss';
 import PokemonList from './components/PokemonList.js';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-
+import { Spin, Row } from 'antd';
 const GET_POKEMONS = gql`
 	query($size: Int!) {
 		pokemons(first: $size) {
@@ -19,18 +19,19 @@ const GET_POKEMONS = gql`
 `;
 function App() {
 	const pokemons = useQuery(GET_POKEMONS, { variables: { size: 10 } });
-	console.log(pokemons);
-	if (pokemons.loading) {
-		return <div>Loading...</div>;
-	}
-	if (pokemons.error) {
-		return <div>Error...</div>;
-	}
 
 	return (
 		<Fragment>
 			<main className='App'>
-				<PokemonList list={pokemons.data.pokemons} />
+				{pokemons.loading ? (
+					<Row justify='center' align='middle' style={{ height: 'inherit' }}>
+						<Spin size='Large' className='' />
+					</Row>
+				) : pokemons.error ? (
+					<div>Error...</div>
+				) : (
+					<PokemonList list={pokemons.data.pokemons} />
+				)}
 			</main>
 		</Fragment>
 	);

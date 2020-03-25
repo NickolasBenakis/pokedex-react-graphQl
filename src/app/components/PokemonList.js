@@ -8,11 +8,7 @@ const PokemonList = ({ list }) => {
 			<List
 				itemLayout='vertical'
 				dataSource={list}
-				renderItem={item => (
-					<List.Item>
-						<Pokemon key={item.id} {...item} />
-					</List.Item>
-				)}
+				renderItem={item => <Pokemon key={item.id} {...item} />}
 			/>
 		</Fragment>
 	);

@@ -1,0 +1,18 @@
+.pokemon-card {
+    border-radius: 22px;
+    margin: 0 auto;
+    max-width: 30rem;
+}
+
+.pokemon-image {
+    cursor: pointer;
+    height: 14rem;
+    width: 14rem;
+    border-radius: inherit;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        transform: scale(1.1);
+        filter: contrast(1.1);
+    }
+}
