@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import Pokemon from './Pokemon';
-import { List, Avatar } from 'antd';
+import { List } from 'antd';
 
 const PokemonList = ({ list }) => {
 	return (
@@ -10,11 +10,6 @@ const PokemonList = ({ list }) => {
 				dataSource={list}
 				renderItem={item => (
 					<List.Item>
-						{/* <List.Item.Meta
-							key={item.id}
-							avatar={<Avatar src={item.image} alt='pokemon_image' />}
-							title={item.name}
-						/> */}
 						<Pokemon key={item.id} {...item} />
 					</List.Item>
 				)}

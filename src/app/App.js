@@ -3,6 +3,7 @@ import '../theme/App.scss';
 import PokemonList from './components/PokemonList.js';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
+
 const GET_POKEMONS = gql`
 	query($size: Int!) {
 		pokemons(first: $size) {
