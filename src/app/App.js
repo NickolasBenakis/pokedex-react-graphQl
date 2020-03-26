@@ -1,9 +1,12 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useLayoutEffect } from 'react';
 import '../theme/App.scss';
 import PokemonList from './components/PokemonList.js';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-import { Spin, Row } from 'antd';
+import Error from './components/Error';
+import Spinner from './components/Spinner';
+import SearchInput from './components/SearchInput';
+
 const GET_POKEMONS = gql`
 	query($size: Int!) {
 		pokemons(first: $size) {
@@ -20,17 +23,42 @@ const GET_POKEMONS = gql`
 function App() {
 	const pokemons = useQuery(GET_POKEMONS, { variables: { size: 10 } });
 
+	useLayoutEffect(() => {
+		const handleScroll = e => {
+			let pos =
+				(document.documentElement.scrollTop || document.body.scrollTop) +
+				document.documentElement.offsetHeight;
+			let max = document.documentElement.scrollHeight;
+
+			// it used to be pos === max
+			if (pos > max - 800) {
+				pokemons.fetchMore({
+					variables: {
+						size: (pokemons.data && pokemons.data.pokemons.length + 10) || 10
+					},
+					updateQuery: (prev, { fetchMoreResult }) => {
+						if (!fetchMoreResult) return prev;
+						return { ...prev, pokemons: [...fetchMoreResult.pokemons] };
+					}
+				});
+			}
+		};
+		window.addEventListener('scroll', handleScroll);
+		return () => window.removeEventListener('scroll', handleScroll);
+	});
+
 	return (
 		<Fragment>
 			<main className='App'>
+				<header className='fixed-header'>
+					<SearchInput />
+				</header>
 				{pokemons.loading ? (
-					<Row justify='center' align='middle' style={{ height: 'inherit' }}>
-						<Spin size='Large' className='' />
-					</Row>
+					<Spinner />
 				) : pokemons.error ? (
-					<div>Error...</div>
+					<Error description={pokemons.error} />
 				) : (
-					<PokemonList list={pokemons.data.pokemons} />
+					<PokemonList list={pokemons.data.pokemons || []} />
 				)}
 			</main>
 		</Fragment>

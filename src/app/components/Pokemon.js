@@ -6,6 +6,7 @@ const Pokemon = ({ image, name }) => {
 			<li style={{ padding: '1.5rem' }}>
 				<Card
 					title={<code style={{ fontWeight: 'bold' }}>{name}</code>}
+					draggable='true'
 					bordered={false}
 					className='pokemon-card'>
 					<img src={image} alt='pokemon_image' className='pokemon-image' />
