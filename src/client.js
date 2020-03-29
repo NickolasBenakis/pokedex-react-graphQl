@@ -1,9 +1,8 @@
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloLink } from 'apollo-link';
-import { HttpLink, crea } from 'apollo-link-http';
-// import { setContext } from 'apollo-link-context';
-// import gql from 'graphql-tag';
+import { HttpLink } from 'apollo-link-http';
+import { resolvers, typeDefs } from './graphQl/resolvers';
 
 const cache = new InMemoryCache();
 const http = new HttpLink({
@@ -12,7 +11,15 @@ const http = new HttpLink({
 const link = ApolloLink.from([http]);
 const client = new ApolloClient({
 	link,
-	cache
+	cache,
+	typeDefs,
+	resolvers
+});
+
+client.writeData({
+	data: {
+		pokemonList: []
+	}
 });
 
 export default client;

@@ -1,11 +1,22 @@
-import React, { Fragment, useLayoutEffect, useContext } from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { GET_POKEMONS } from '../../graphQl/queries';
+import React, { Fragment, useLayoutEffect, useEffect } from 'react';
+import { useQuery, useLazyQuery } from '@apollo/react-hooks';
+import { GET_POKEMONS, GET_POKEMON } from '../../graphQl/queries';
 import Error from './Error';
 import Spinner from './Spinner';
 import PokemonList from './PokemonList';
+import EventEmitter from '../../EventEmitter';
+
 const PokemonSection = () => {
-	const pokemons = useQuery(GET_POKEMONS, { variables: { size: 10 } });
+	const allPokemonsQuery = useQuery(GET_POKEMONS, {
+		variables: { size: 10 }
+	});
+	const [fetchPokemon, pokemonData] = useLazyQuery(GET_POKEMON);
+
+	EventEmitter.subscribe('FETCH_POKEMON', pokemonName => {
+		fetchPokemon({
+			variables: { name: pokemonName }
+		});
+	});
 
 	useLayoutEffect(() => {
 		console.log('App component');
@@ -16,13 +27,17 @@ const PokemonSection = () => {
 			let max = document.documentElement.scrollHeight;
 
 			// it used to be pos === max
-			if (pos > max - 800) {
+			if (pos === max) {
 				console.log('Fetch more pokemons');
-				pokemons.fetchMore({
+				allPokemonsQuery.fetchMore({
 					variables: {
-						size: (pokemons.data && pokemons.data.pokemons.length + 10) || 10
+						size:
+							(allPokemonsQuery.data &&
+								allPokemonsQuery.data.pokemons.length + 10) ||
+							10
 					},
 					updateQuery: (prev, { fetchMoreResult }) => {
+						console.log(prev);
 						if (!fetchMoreResult) return prev;
 						return { ...prev, pokemons: [...fetchMoreResult.pokemons] };
 					}
@@ -33,14 +48,18 @@ const PokemonSection = () => {
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
 
+	if (pokemonData && pokemonData.data && pokemonData.data.pokemon) {
+		return <PokemonList list={[pokemonData.data.pokemon] || []} />;
+	}
+
 	return (
 		<Fragment>
-			{pokemons.loading ? (
+			{allPokemonsQuery.loading ? (
 				<Spinner />
-			) : pokemons.error ? (
-				<Error description={pokemons.error} />
+			) : allPokemonsQuery.error ? (
+				<Error description={allPokemonsQuery.error} />
 			) : (
-				<PokemonList list={pokemons.data.pokemons || []} />
+				<PokemonList list={allPokemonsQuery.data.pokemons || []} />
 			)}
 		</Fragment>
 	);

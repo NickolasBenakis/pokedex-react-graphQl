@@ -18,3 +18,9 @@ export const GET_POKEMON = gql`
 	}
 	${POKEMON_DETAILS}
 `;
+
+export const GET_POKEMON_LIST = gql`
+	{
+		pokemonList @client
+	}
+`;
